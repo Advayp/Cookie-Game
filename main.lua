@@ -51,6 +51,7 @@ function love.load()
     sounds = {
         ['pickup'] = love.audio.newSource('sounds/pickup.wav', 'static'),
         ['lifeLost'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+        ['pause'] = love.audio.newSource('sounds/pause.wav', 'static')
     }
 
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -90,6 +91,7 @@ function love.keypressed(key)
     
     if key == 'p' then
         if gameState == 'play' then
+            sounds['pause']:play()
             gameState = 'pause'
             for i = 0, 3 do
                 cookies[i].dy = 0
@@ -101,6 +103,7 @@ function love.keypressed(key)
 
             player.dx = 0
         elseif gameState == 'pause' then
+            sounds['pause']:play()
             gameState = 'play'
             for i = 0, 3 do
                 if score >= 15 then

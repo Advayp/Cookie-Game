@@ -75,12 +75,64 @@ function love.keypressed(key)
         end
     end
     
+    if key == 'p' then
+        if gameState == 'play' then
+            gameState = 'pause'
+            for i = 0, 3 do
+                cookies[i].dy = 0
+            end
+
+            for i = 0, 1 do
+                cheese[i].dy = 0
+            end
+
+            player.dx = 0
+        elseif gameState == 'pause' then
+            gameState = 'play'
+            for i = 0, 3 do
+                if score >= 15 then
+                    cookies[i].dy = 70
+                else
+                    cookies[i].dy = 50
+                end
+            end
+
+            for i = 0, 1 do
+                if score >= 15 then
+                    cheese[i].dy = 90
+                else
+                    cheese[i].dy = 70
+                end
+            end
+
+            player.dx = 200
+        end
+    end
+
 end
 
 function love.update(dt)
     
     if lives == 0 then
         gameState = 'done'
+    end
+
+    if score >= 15 then
+        for i = 0, 1 do
+            cheese[i].dy = 110
+        end
+
+        for i = 0, 3 do
+            cookies[i].dy = 90
+        end
+    else
+        for i = 0, 1 do
+            cheese[i].dy = 70
+        end
+
+        for i = 0, 3 do
+            cookies[i].dy = 50
+        end
     end
 
     if gameState == 'play' then
@@ -113,7 +165,7 @@ function love.draw()
 
     love.graphics.setFont(defaultFont)
 
-    if gameState == 'play' then
+    if gameState == 'play' or gameState == 'pause' then
 
         love.graphics.clear(0, 130 / 255, 170 / 255, 1)
 

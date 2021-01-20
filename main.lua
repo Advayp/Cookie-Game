@@ -39,6 +39,11 @@ function love.load()
         cheese[i] = Collidable(cheeseIMG, 70)
     end
 
+    sounds = {
+        ['pickup'] = love.audio.newSource('sounds/pickup.wav', 'static'),
+        ['lifeLost'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+    }
+
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -83,6 +88,7 @@ function love.update(dt)
             if cookies[i]:collides(player) then
                 cookies[i]:reset()
                 score = score + 1
+                sounds['pickup']:play()
             end
 
 
@@ -93,6 +99,7 @@ function love.update(dt)
             if cheese[i]:collides(player) then
                 cheese[i]:reset()
                 lives = lives - 1
+                sounds['lifeLost']:play()
             end
 
             cheese[i]:update(dt, 0)

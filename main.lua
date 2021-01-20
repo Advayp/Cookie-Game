@@ -14,7 +14,7 @@ function love.load()
 
     math.randomseed(os.time())
 
-    love.window.setTitle('Cookie Getter')
+    love.window.setTitle('Cookie Catcher')
 
     defaultFont = love.graphics.newFont('fonts/font.TTF', 32)
 

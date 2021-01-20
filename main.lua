@@ -8,8 +8,7 @@ push = require 'push'
 Class = require 'class'
 
 require 'Player'
-require 'Cookie'
-require 'Cheese'
+require 'Collidable'
 
 function love.load()
 
@@ -25,15 +24,19 @@ function love.load()
     defaultFont = love.graphics.newFont('fonts/font.TTF', 16)
 
     player = Player(VIRTUAL_WIDTH / 2 - 30, VIRTUAL_HEIGHT - 30)
+
+    cookieIMG = love.graphics.newImage('images/cookie.png')
+    cheeseIMG = love.graphics.newImage('images/cheese.png')
+
     cheese = {}
     cookies = {}
 
     for i = 0, 3 do
-        cookies[i] = Cookie()
+        cookies[i] = Collidable(cookieIMG, 50)
     end
 
     for i = 0, 1 do
-        cheese[i] = Cheese()
+        cheese[i] = Collidable(cheeseIMG, 70)
     end
 
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -49,6 +52,24 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
+    if key == 'enter' or key == 'return' then
+        if gameState == 'done' then
+            gameState = 'play'
+            lives = 3
+            score = 0
+
+            for i = 0, 3 do
+                cookies[i]:reset()
+            end
+
+            for i = 0, 1 do
+                cheese[i]:reset()
+            end
+
+        end
+    end
+    
 end
 
 function love.update(dt)
@@ -60,23 +81,21 @@ function love.update(dt)
     if gameState == 'play' then
         for i = 0, 3 do
             if cookies[i]:collides(player) then
-                cookies[i].x = math.random(20, VIRTUAL_WIDTH - 30)
-                cookies[i].y = math.random(5, 30)
+                cookies[i]:reset()
                 score = score + 1
             end
 
 
-            cookies[i]:update(dt)
+            cookies[i]:update(dt, -1)
         end
 
         for i = 0, 1 do
             if cheese[i]:collides(player) then
-                cheese[i].x = math.random(20, VIRTUAL_WIDTH - 30)
-                cheese[i].y = math.random(5, 30)
+                cheese[i]:reset()
                 lives = lives - 1
             end
 
-            cheese[i]:update(dt)
+            cheese[i]:update(dt, 0)
         end
         player:update(dt)
     end
@@ -96,22 +115,26 @@ function love.draw()
             cookies[i]:draw()
         end
     
+        player:draw()
 
-
-        love.graphics.setColor(232 / 255, 105 / 255, 21 / 255, 1)
-        love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT - 10, VIRTUAL_WIDTH, 10)
-        love.graphics.setColor(1, 1, 1, 1)
-
+        love.graphics.setColor(0, 1, 170 / 255, 1)
         love.graphics.print("Score: " .. tostring(score) .. ". Lives: " .. tostring(lives))
 
         for i = 0, 1 do
             cheese[i]:draw()
         end
-    
-        player:draw()
+
+        love.graphics.setColor(232 / 255, 105 / 255, 21 / 255, 1)
+        love.graphics.rectangle('fill', 0, VIRTUAL_HEIGHT - 10, VIRTUAL_WIDTH, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+
     elseif gameState == 'done' then
         love.graphics.clear(0, 0, 0, 1)
-        love.graphics.print("Game Over", VIRTUAL_WIDTH / 2 - 16, VIRTUAL_HEIGHT / 2 - 16)
+        game_over = love.graphics.newImage('images/game-over.png')
+        love.graphics.draw(game_over, VIRTUAL_WIDTH / 2 - 128, VIRTUAL_HEIGHT / 2 - 128)
+        love.graphics.setColor(0, 1, 170 / 255, 1)
+        love.graphics.print("Final Score: " .. tostring(score), VIRTUAL_WIDTH / 2 - 55)
+        love.graphics.setColor(1, 1, 1, 1)
     end 
     push:apply('end')
 end

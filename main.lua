@@ -9,6 +9,7 @@ Class = require 'class'
 
 require 'Player'
 require 'Collidable'
+require 'Heart'
 
 function love.load()
 
@@ -30,6 +31,14 @@ function love.load()
 
     cheese = {}
     cookies = {}
+
+    hearts = {}
+
+    x = 82
+    for i = 0, 2 do
+        hearts[i] = Heart(x)
+        x = x + 18
+    end
 
     for i = 0, 3 do
         cookies[i] = Collidable(cookieIMG, 50)
@@ -63,6 +72,10 @@ function love.keypressed(key)
             gameState = 'play'
             lives = 3
             score = 0
+
+            for i = 0, 2 do
+                hearts[i].state = 'norm'
+            end
 
             for i = 0, 3 do
                 cookies[i]:reset()
@@ -151,6 +164,7 @@ function love.update(dt)
             if cheese[i]:collides(player) then
                 cheese[i]:reset()
                 lives = lives - 1
+                hearts[lives].state = 'gray'
                 sounds['lifeLost']:play()
             end
 
@@ -177,10 +191,15 @@ function love.draw()
         player:draw()
 
         love.graphics.setColor(0, 1, 170 / 255, 1)
-        love.graphics.print("Score: " .. tostring(score) .. ". Lives: " .. tostring(lives))
+        love.graphics.print("Score: " .. tostring(score))
 
         for i = 0, 1 do
             cheese[i]:draw()
+        end
+
+        love.graphics.setColor(1, 1, 1, 1)
+        for i = 0, 2 do
+            hearts[i]:draw()
         end
 
         love.graphics.setColor(232 / 255, 105 / 255, 21 / 255, 1)

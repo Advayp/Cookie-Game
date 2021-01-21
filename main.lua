@@ -1,61 +1,81 @@
+-- Initial Screen Dimensions
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
+-- Virtual Screen Dimensions
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
+-- Imports push and class
 push = require 'push'
 Class = require 'class'
 
+-- Imports Code that I have written
 require 'Player'
 require 'Collidable'
 require 'Heart'
 
 function love.load()
 
+    -- Initial Score and Lives
     score = 0
     lives = 3
 
+    -- Initial Game State
     gameState = 'play'
-
+    
+    -- Seeds the Random Number generation
     math.randomseed(os.time())
 
+    -- Title of Window
     love.window.setTitle('Cookie Catcher')
 
+    -- Defualt Font
     defaultFont = love.graphics.newFont('fonts/font.TTF', 16)
 
+    -- Player
     player = Player(VIRTUAL_WIDTH / 2 - 30, VIRTUAL_HEIGHT - 30)
 
+    -- Image of the Cookie and Cheese
     cookieIMG = love.graphics.newImage('images/cookie.png')
     cheeseIMG = love.graphics.newImage('images/cheese.png')
 
+    -- Cheese and Cookies Tables. Used to store information about 
+    -- each cookie and each piece of cheese
     cheese = {}
     cookies = {}
 
+    -- Hearts table
     hearts = {}
 
+    -- Populates Hearts Table
     x = 82
     for i = 0, 2 do
         hearts[i] = Heart(x)
         x = x + 18
     end
 
+    -- Populates cookies table
     for i = 0, 3 do
         cookies[i] = Collidable(cookieIMG, 50)
     end
 
+    -- Populates cheese table
     for i = 0, 1 do
         cheese[i] = Collidable(cheeseIMG, 70)
     end
 
+    -- Sounds tabne to store sounds
     sounds = {
         ['pickup'] = love.audio.newSource('sounds/pickup.wav', 'static'),
         ['lifeLost'] = love.audio.newSource('sounds/hurt.wav', 'static'),
         ['pause'] = love.audio.newSource('sounds/pause.wav', 'static')
     }
 
+    -- Default Filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    -- Sets up the screen
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         resizable = false,
@@ -68,31 +88,41 @@ function love.keypressed(key)
         love.event.quit()
     end
 
+    -- Allows user to restart
     if key == 'enter' or key == 'return' then
         if gameState == 'done' then
             gameState = 'play'
+
+            -- Resets values
             lives = 3
             score = 0
 
             for i = 0, 2 do
+                -- Sets the state to the normal state of the heart (red)
                 hearts[i].state = 'norm'
             end
 
             for i = 0, 3 do
+                -- Resets the x and y of the cookies
                 cookies[i]:reset()
             end
 
             for i = 0, 1 do
+                -- Resets the x and y of the cheese
                 cheese[i]:reset()
             end
 
         end
     end
     
+    -- Pausing
     if key == 'p' then
         if gameState == 'play' then
+            -- Plays the pause sound
             sounds['pause']:play()
             gameState = 'pause'
+
+            -- Sets the dx or dy for each object to 0 which looks like the game has paused.
             for i = 0, 3 do
                 cookies[i].dy = 0
             end
@@ -103,6 +133,7 @@ function love.keypressed(key)
 
             player.dx = 0
         elseif gameState == 'pause' then
+            -- Unpauses the game
             sounds['pause']:play()
             gameState = 'play'
             for i = 0, 3 do
